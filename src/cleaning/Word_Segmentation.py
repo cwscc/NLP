@@ -43,24 +43,64 @@ def seg_sentence(sentence):
     return outstr  
 
 
+def create_table():
+    db = pymysql.connect("localhost", "root", "123456", "preprocessed")
+    cursor = db.cursor()
+    # 使用 execute() 方法执行 SQL，如果表存在则删除
+    cursor.execute("DROP TABLE IF EXISTS hpscoreneg1")
+    cursor.execute("DROP TABLE IF EXISTS hpscorepos1")
+    cursor.execute("DROP TABLE IF EXISTS lenovoscoreneg1")
+    cursor.execute("DROP TABLE IF EXISTS lenovoscorepos1")
+
+    sql1 = """CREATE TABLE hpscoreneg1 (         
+             `id` INT NOT NULL AUTO_INCREMENT,
+             `comment` VARCHAR(1000) NOT NULL,
+              PRIMARY KEY (`id`))"""
+    sql2 = """CREATE TABLE hpscorepos1 (         
+             `id` INT NOT NULL AUTO_INCREMENT,
+             `comment` VARCHAR(1000) NOT NULL,
+              PRIMARY KEY (`id`))"""
+    sql3 = """CREATE TABLE lenovoscoreneg1 (         
+             `id` INT NOT NULL AUTO_INCREMENT,
+             `comment` VARCHAR(1000) NOT NULL,
+              PRIMARY KEY (`id`))"""
+    sql4 = """CREATE TABLE lenovoscorepos1 (         
+             `id` INT NOT NULL AUTO_INCREMENT,
+             `comment` VARCHAR(1000) NOT NULL,
+              PRIMARY KEY (`id`))"""
+    
+    cursor.execute(sql1)
+    cursor.execute(sql2)
+    cursor.execute(sql3)
+    cursor.execute(sql4)
+    
+    print("CREATE TABLE OK")
+    # 关闭数据库连接
+    cursor.close()
+    db.close()
+
+
 if __name__ == '__main__':
+    #创建四个表，供处理后存储
+    create_table()
+    
     # 建立两个数据库连接，第一个存的是去重、无效评论和短文本的数据，第二个是分词去停用词后存储的
     conn1 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='preprocessing', charset='utf8')
     cur1 = conn1.cursor()
     conn2 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='preprocessed', charset='utf8')
     cur2 = conn2.cursor()
     
-    select_sql1 = "select `comment` from hpscoreneg"
-    insert_sql1 = "insert into `hpscoreneg` (`comment`) values(%s)"
+    select_sql1 = "select `comment` from hpscoreneg1"
+    insert_sql1 = "insert into `hpscoreneg1` (`comment`) values(%s)"
     
-    select_sql2 = "select comment from hpscorepos"
-    insert_sql2 = "insert into `hpscorepos` (`comment`) values(%s)"
+    select_sql2 = "select comment from hpscorepos1"
+    insert_sql2 = "insert into `hpscorepos1` (`comment`) values(%s)"
     
-    select_sql3 = "select comment from lenovoscoreneg"
-    insert_sql3 = "insert into `lenovoscoreneg` (`comment`) values(%s)"
+    select_sql3 = "select comment from lenovoscoreneg1"
+    insert_sql3 = "insert into `lenovoscoreneg1` (`comment`) values(%s)"
     
-    select_sql4 = "select comment from lenovoscorepos"
-    insert_sql4 = "insert into `lenovoscorepos` (`comment`) values(%s)"
+    select_sql4 = "select comment from lenovoscorepos1"
+    insert_sql4 = "insert into `lenovoscorepos1` (`comment`) values(%s)"
     
     adjust_jieba_dict("D:/大三/大创/连接词/connecting_words_find.txt")
     
@@ -100,5 +140,5 @@ if __name__ == '__main__':
     conn1.close()
     conn2.close()
     
-    print("finish!")
+    print("\nfinish!")
   
