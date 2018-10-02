@@ -84,7 +84,6 @@ def create_table():
     db.close()
     
     
-    
 if __name__ == '__main__':
     create_table()
     
