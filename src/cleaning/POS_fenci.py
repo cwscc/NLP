@@ -94,16 +94,16 @@ if __name__ == '__main__':
     conn2 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='preprocessed', charset='utf8')
     cur2 = conn2.cursor()
     
-    select_sql1 = "select `comment` from hpscoreneg1"
+    select_sql1 = "select `comment` from hpscoreneg"
     insert_sql1 = "insert into `hpscoreneg2` (`comment`) values(%s)"
     
-    select_sql2 = "select comment from hpscorepos1"
+    select_sql2 = "select comment from hpscorepos"
     insert_sql2 = "insert into `hpscorepos2` (`comment`) values(%s)"
     
-    select_sql3 = "select comment from lenovoscoreneg1"
+    select_sql3 = "select comment from lenovoscoreneg"
     insert_sql3 = "insert into `lenovoscoreneg2` (`comment`) values(%s)"
     
-    select_sql4 = "select comment from lenovoscorepos1"
+    select_sql4 = "select comment from lenovoscorepos"
     insert_sql4 = "insert into `lenovoscorepos2` (`comment`) values(%s)"
     
     adjust_jieba_dict("D:/大三/大创/连接词/connecting_words_find.txt")
