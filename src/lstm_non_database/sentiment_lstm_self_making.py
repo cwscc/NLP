@@ -2,6 +2,7 @@
 
 import yaml
 import sys
+import os
 
 from sklearn.cross_validation import train_test_split   #处理向量
 import multiprocessing  #多线程处理
@@ -15,10 +16,11 @@ from keras.layers.embeddings import Embedding   #词向量嵌入模块
 from keras.layers.recurrent import LSTM         #模块的LSTM层
 from keras.layers.core import Dense, Dropout, Activation    #用于添加层，dropout数据， 激活函数
 from keras.models import model_from_yaml                    #用于存储模型数据
-import keras
+
 
 import jieba
 import pandas as pd
+import pymysql
 #
 np.random.seed(1337)    #再现？？？？
 sys.setrecursionlimit(1000000)  #设置允许最大的迭代次数是 1千万次
@@ -43,13 +45,21 @@ def loadfile():
     """
 
     # 我们的资料
-    neg1 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/hpscoreneg_1.csv', header=None)
-    pos1 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/hpscorepos_1.csv', header=None)
+    conn = pymysql.connect(host="127.0.0.1", user="root", passwd="123456", db="preprocessed", charset='utf8')
+    sqlneg = "select comment FROM hpscoreneg union select comment from lenovoscoreneg union select comment from negcomment"
+    sqlpos = "select comment FROM hpscorepos union select comment from lenovoscorepos union select comment from poscomment where id between 1 and 3898"
+    
+    neg1 = pd.read_sql(sqlneg, conn)
+    pos1 = pd.read_sql(sqlpos, conn)
+    
+    
+#     neg1 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/hpscoreneg_1.csv', header=None)
+#     pos1 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/hpscorepos_1.csv', header=None)
 
     # neg2 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/lenovoscoreneg_1.csv', header=None)
     # pos2 = pd.read_csv('F:/pycharm project/mysecondproject/mllearning/lenovoscorepos_1.csv', header=None)
 
-    combined = np.concatenate((pos1[0], neg1[0]))
+    combined = np.concatenate((pos1, neg1),axis=0)
     y = np.concatenate((np.ones(len(pos1), dtype=int), np.zeros(len(neg1), dtype=int)))  # 拼接数组，aixs参数0表示按照行向，1是纵向
 
     return combined, y
@@ -120,7 +130,8 @@ def word2vec_train(combined):
                      sg=1)                  #sg=0 --> cbow算法(默认)   sg=1 --> skip-gram算法
     model.build_vocab(combined)             #创建字典
     model.train(combined,total_words=model.corpus_count, epochs=model.epochs)  #  jc此处改动，，训练模型
-    model.save('F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/Word2vec_model_change1.pkl')    #保存模型
+    path1=os.path.abspath('.')   #表示当前所处的文件夹的绝对路径
+    model.save(path1 + '\\word2vec\\Word2vec_model_change1.pkl')    #保存模型
     index_dict, word_vectors, combined = create_dictionaries(model=model, combined=combined)
     return index_dict, word_vectors, combined
 
@@ -246,9 +257,9 @@ def train_lstm(n_symbols, embedding_weights, x_train, y_train, x_test, y_test):
     score = model.evaluate(x_test, y_test, batch_size=batch_size)
 
     yaml_string = model.to_yaml()
-    with open("F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/lstm.yml", 'w') as outfile:
+    with open("word2vec/lstm.yml", 'w') as outfile:
         outfile.write( yaml.dump(yaml_string, default_flow_style=True) )
-    model.save_weights( "F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/lstm.h5" )
+    model.save_weights( "word2vec/lstm.h5" )
     print('Test score:', score)
 
 # 训练模型，并进行保存
@@ -257,8 +268,8 @@ def train():
     combined, y = loadfile()
     print(len(combined), len(y))
 
-    print('Tokenising...进行词语分词处理..')
-    combined = tokenizer(combined)
+#     print('Tokenising...进行词语分词处理..')
+#     combined = tokenizer(combined)
 
     print("Training a word2vec model...开始训练词向量模型")
     index_dict, word_vectors, combined = word2vec_train(combined)       #这个combined是分好词的列表/矩阵
@@ -274,20 +285,20 @@ def train():
 def input_tranform(string):
     words = jieba.lcut(string)
     words = np.array(words).reshape(1,-1)
-    model = Word2Vec.load("F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/Word2vec_model_change1.pkl")
+    model = Word2Vec.load("Word2vec/Word2vec_model_change1.pkl")
     _, _, combined = create_dictionaries(model, words)
     return combined
 
 # 进行lstm预测
 def lstm_predict(string):
     print("loading model加载模型...")
-    with open('F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/lstm.yml', 'r') as f:
+    with open('Word2vec/lstm.yml', 'r') as f:
         yaml_string = yaml.load(f)
 
     model = model_from_yaml(yaml_string)
 
     print("loading weights... 加载权重")
-    model.load_weights("F:/pycharm project/mysecondproject/Sentiment-Analysis-master/lstm_make_by_self_data/lstm.h5")
+    model.load_weights("Word2vec/lstm.h5")
     model.compile(loss="binary_crossentropy",
                   optimizer='adam',
                   metrics=['accuracy'])
@@ -301,15 +312,15 @@ def lstm_predict(string):
         print(string, 'negative')
 
 if __name__ == '__main__':
-    string = '电脑质量太差了，傻逼店家，赚黑心钱，以后再也不会买了'
-    # string = "客服的态度真的很好，好的不得了，只是电脑的屏幕真的一般，运行内存16G但打起游戏来很卡，但是总体上说还不错"
-    string1 = '质量不错，是正品 ，安装师傅也很好，才要了83元材料费'
-    string2 = "显示器好评，键盘摸着舒服，但是客服态度真的有问题，问了几次都没有回我，老实说电脑是真心不错，给个好评吧"
-    string3 = "呵呵！这电脑真是服了，跑不动，性价比一般"
-    # print("有主函数main开始train")
-    # train()
-    print("有主函数开始predict预测情感")
-    lstm_predict(string3)
+#     string = '电脑质量太差了，傻逼店家，赚黑心钱，以后再也不会买了'
+#     # string = "客服的态度真的很好，好的不得了，只是电脑的屏幕真的一般，运行内存16G但打起游戏来很卡，但是总体上说还不错"
+#     string1 = '质量不错，是正品 ，安装师傅也很好，才要了83元材料费'
+#     string2 = "显示器好评，键盘摸着舒服，但是客服态度真的有问题，问了几次都没有回我，老实说电脑是真心不错，给个好评吧"
+#     string3 = "呵呵！这电脑真是服了，跑不动，性价比一般"
+#     # print("有主函数main开始train")
+    train()
+#     print("有主函数开始predict预测情感")
+#     lstm_predict(string3)
 
 
 
@@ -507,30 +518,3 @@ if __name__ == '__main__':
 #     print
 #     string = '手机质量太差了，傻逼店家，赚黑心钱，以后再也不会买了'
 #     lstm_predict(string)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
