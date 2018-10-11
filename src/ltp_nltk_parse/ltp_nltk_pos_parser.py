@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import pymysql
 import sys
 import os
@@ -15,7 +15,7 @@ import shelve
 # 连接数据库
 db_name = "preprocessed"
 user = "root"
-password = "Xg123456"
+password = "" ###注意这里填写自己数据库的代码
 
 # LTP模型路径
 LTP_DATA_DIR = 'D:/Anaconda/ltp/3.3.1/ltp_data/'  # ltp模型目录的路径
