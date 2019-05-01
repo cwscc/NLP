@@ -68,6 +68,7 @@ def adjust_jieba_dict(adjust_word_file):
 
     f.close()
 
+#用jieba分词
 def seg_sentence_new(sentence):
 
     adjust_jieba_dict("connect_word_zhuang.txt") #调整jieba词频
@@ -95,7 +96,7 @@ def seg_sentence_new(sentence):
     return word_list
 
 
-# word_list是嵌套列表，包含每一个干净的句子的列表
+
 # LTP词性标注
 def postagger_ltp(words):
     postagger = Postagger()     #初始化实例
@@ -110,16 +111,18 @@ def postagger_ltp(words):
     return tag_list                #返回所有句子以及每个句子的词性列表
 
 
-#获取属性词N列表
+#读取txt文件(词典文件)
 def get_dict(filename):
     f = open(filename, 'r', encoding='utf-8')
     dict = []
-    for noun in f.readlines():
-        noun = noun.strip()
-        dict.append(noun)
+    for word in f.readlines():
+        word = word.strip()
+        dict.append(word)
     f.close()
     return dict
 
+
+#分离出形容词中包含的程度副词
 def ltp_seg_sentiment_word(one_list):
     segmentor = Segmentor()  # 初始化实例
     segmentor.load(seg_model_path)  # 加载模型
@@ -165,8 +168,7 @@ def ltp_seg_sentiment_word(one_list):
     return relist
 
 
-#  LTP依存句法分析,返回列表(重写)
-
+#  LTP依存句法分析,返回列表
 def parser_ltp_arc(word_list, tag_list):
     parser = Parser()   #初始化实例
     parser.load(par_model_path)
@@ -174,17 +176,14 @@ def parser_ltp_arc(word_list, tag_list):
     parser.release()
     return arcs
 
-
+# 评价对象和评价词抽取 参数分别是分词列表，句法分析结果，词性列表
 def extract_noun_base_pager_rule(sentence, arcs, pos):
-    all_list = [] #所有评论的名词
     noun_list = get_dict('CNoun.txt')
     verb_list = get_dict('CVerb.txt')
     adv_dic = get_dict('adv_dic.txt')
     neg_dic = get_dict('neg_dic.txt')
 
-    count = 0
     one_list = [] #存放每条评论抽出来的词对
-    count += 1
     for flag in range(len(sentence)):
         mark4 = False  # 是否符合四维规则
         head = arcs[flag].head-1 #head表示依存弧的父节点词的数组下标
@@ -449,6 +448,8 @@ def extract_noun_base_pager_rule(sentence, arcs, pos):
 
     return one_list
 
+
+#分析每条评论的主方法
 def sentence_analyse(sentence):
     sentence_after_process = sentence_process(sentence)
     print('预处理后的评论：',sentence_after_process)
