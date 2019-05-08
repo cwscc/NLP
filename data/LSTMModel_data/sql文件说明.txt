@@ -1,0 +1,2 @@
+crawl_data.sql是爬虫得到的原始数据，经过简单处理后得到训练集train_set.sql，作为模型的输入，
+test_set.sql是人工标注的测试集，测试模型准确率。
