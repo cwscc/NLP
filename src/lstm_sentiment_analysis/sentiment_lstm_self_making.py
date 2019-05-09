@@ -401,10 +401,16 @@ def lstm_batch_predict(db_user, db_password, db_name, sql):
 
 if __name__ == '__main__':
 
-    dict = lstm_batch_predict("root", "123456", "crawl", "select * from hpscorepos1 union \
-    select * from hpscoreneg1 union select * from lenovoscorepos1 union \
-    select * from lenovoscoreneg1")
-    print(dict[1])
+#     hpDict = lstm_batch_predict("root", "123456", "nlp", "select * from hpscorepos union \
+#     select * from hpscoreneg")
+#     lenovoDict = lstm_batch_predict("root", "123456", "nlp","select * from lenovoscorepos \
+#     union select * from lenovoscoreneg")
+#     print(hpDict)
+#     print(lenovoDict)
+#     fw = open("comment_tendency.txt", 'w+')
+#     fw.write(str(hpDict))  # 把字典转化为str
+#     fw.write(str(lenovoDict))
+#     fw.close()
     
     # 训练模型
 #     print("train...")
@@ -416,8 +422,8 @@ if __name__ == '__main__':
 #     string = "显示器好评，键盘摸着舒服，但是客服态度真的有问题，问了几次都没有回我，老实说电脑是真心不错，给个好评吧"    #positive
 #     string = "呵呵！这电脑真是服了，跑不动，性价比一般"     #negative
 #     string = "满怀高兴回来的机子，拿到手不到24小时，彻底死机5回，就玩个dnf还捎带下点东西。。。这跑20w分是假的吧？我台式机没显卡也是i5都玩的杠杠的。各种多开。快递小哥是没得说。第一次一星，实话实说。"
-#     string = "对电脑本身还是很满意的，室友都说颜值不错，很好看，1.99mm，一开始以为很厚，可是拿到手的时候感觉还不错，问了客服很多问题，他也一一解答了。唯一不足的就是，物流，无缘无故的在长沙停留了那么久，毕竟五千多的东西，免不了担起心来，而且之所以这么急，也在于距离计算机考试就这么几天了。。。。。。。总体来说还不错，好评"
-#     print(lstm_predict(string))
+    string = "对电脑本身还是很满意的，室友都说颜值不错，很好看，1.99mm，一开始以为很厚，可是拿到手的时候感觉还不错，问了客服很多问题，他也一一解答了。唯一不足的就是，物流，无缘无故的在长沙停留了那么久，毕竟五千多的东西，免不了担起心来，而且之所以这么急，也在于距离计算机考试就这么几天了。。。。。。。总体来说还不错，好评"
+    print(lstm_sentence_predict(string))
 
 
 ############################################################
