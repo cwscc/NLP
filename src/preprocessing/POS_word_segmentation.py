@@ -48,27 +48,27 @@ def pos_segment(sentence):
 
 # 在数据库中创建表
 def create_table():
-    db = pymysql.connect("localhost", "root", "123456", "preprocessed")
+    db = pymysql.connect("localhost", "root", "123456", "interface_data")
     cursor = db.cursor()
     # 使用 execute() 方法执行 SQL，如果表存在则删除
-    cursor.execute("DROP TABLE IF EXISTS hpscoreneg2")
-    cursor.execute("DROP TABLE IF EXISTS hpscorepos2")
-    cursor.execute("DROP TABLE IF EXISTS lenovoscoreneg2")
-    cursor.execute("DROP TABLE IF EXISTS lenovoscorepos2")
+    cursor.execute("DROP TABLE IF EXISTS hp_neg_segandpos")
+    cursor.execute("DROP TABLE IF EXISTS hp_pos_segandpos")
+    cursor.execute("DROP TABLE IF EXISTS lenovo_neg_segandpos")
+    cursor.execute("DROP TABLE IF EXISTS lenovo_pos_segandpos")
 
-    sql1 = """CREATE TABLE hpscoreneg2 (
+    sql1 = """CREATE TABLE hp_neg_segandpos (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
-    sql2 = """CREATE TABLE hpscorepos2 (
+    sql2 = """CREATE TABLE hp_pos_segandpos (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
-    sql3 = """CREATE TABLE lenovoscoreneg2 (
+    sql3 = """CREATE TABLE lenovo_neg_segandpos (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
-    sql4 = """CREATE TABLE lenovoscorepos2 (
+    sql4 = """CREATE TABLE lenovo_pos_segandpos (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
@@ -89,22 +89,22 @@ if __name__ == '__main__':
     create_table()
     
     # 建立两个数据库连接，第一个存的是去重、无效评论和短文本的数据，第二个是词性标注分词去停用词后存储的
-    conn1 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='preprocessing', charset='utf8')
+    conn1 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='interface_data', charset='utf8')
     cur1 = conn1.cursor()
-    conn2 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='preprocessed', charset='utf8')
+    conn2 = pymysql.connect(host='127.0.0.1', user='root', passwd='123456', db='interface_data', charset='utf8')
     cur2 = conn2.cursor()
     
-    select_sql1 = "select `comment` from hpscoreneg"
-    insert_sql1 = "insert into `hpscoreneg2` (`comment`) values(%s)"
+    select_sql1 = "select `comment` from hp_neg_filter"
+    insert_sql1 = "insert into `hp_neg_segandpos` (`comment`) values(%s)"
     
-    select_sql2 = "select comment from hpscorepos"
-    insert_sql2 = "insert into `hpscorepos2` (`comment`) values(%s)"
+    select_sql2 = "select comment from hp_pos_filter"
+    insert_sql2 = "insert into `hp_pos_segandpos` (`comment`) values(%s)"
     
-    select_sql3 = "select comment from lenovoscoreneg"
-    insert_sql3 = "insert into `lenovoscoreneg2` (`comment`) values(%s)"
+    select_sql3 = "select comment from lenovo_neg_filter"
+    insert_sql3 = "insert into `lenovo_neg_segandpos` (`comment`) values(%s)"
     
-    select_sql4 = "select comment from lenovoscorepos"
-    insert_sql4 = "insert into `lenovoscorepos2` (`comment`) values(%s)"
+    select_sql4 = "select comment from lenovo_pos_filter"
+    insert_sql4 = "insert into `lenovo_pos_segandpos` (`comment`) values(%s)"
     
     adjust_jieba_dict("D:/大三/大创/连接词/connecting_words_find.txt")
     

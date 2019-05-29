@@ -68,7 +68,18 @@
 # print(lists[0][0].split('/')[0])
 # file.close()
 
-
+# dict = {}
+# n = 0.5
+# with open("程度副词.txt",'r',encoding='gbk') as f:
+#     for line in f:
+#         line = line.strip('\n')
+#         words = line.split(' ')
+#         dict[str(n)] = words
+#         n += 0.5
+# fw = open("sentiment_label_dicts/degree_adverb_words.txt",'w+')
+# fw.write(str(dict))      #把字典转化为str
+# fw.close()
+    
 #     dict = {}
 #     n = 0.5
 #     with open("新建文本文档.txt",'r',encoding='gbk') as f:

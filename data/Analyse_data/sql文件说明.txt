@@ -1,1 +1,1 @@
-raw_data是没有经过处理的原评论，processed_data是进行处理后的数据（主要是去掉空白符号和替换一些标点符号），用于ltp_analyse包下的抽取评价词+情感词对方法。
+crawl_data.sql是爬取的数据，raw_data是经过简单预处理后的数据，processed_data是进行处理后的数据（主要是去掉空白符号和替换一些标点符号），用于ltp_analyse包下的抽取评价词+情感词对方法。
