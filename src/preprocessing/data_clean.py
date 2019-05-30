@@ -14,31 +14,31 @@ def create_table():
     cursor = db.cursor()
     
     # 使用 execute() 方法执行 SQL，如果表存在则删除
-    cursor.execute("DROP TABLE IF EXISTS hp_neg_filter")
+#     cursor.execute("DROP TABLE IF EXISTS hp_neg_filter")
     cursor.execute("DROP TABLE IF EXISTS hp_pos_filter")
-    cursor.execute("DROP TABLE IF EXISTS lenovo_neg_filter")
+#     cursor.execute("DROP TABLE IF EXISTS lenovo_neg_filter")
     cursor.execute("DROP TABLE IF EXISTS lenovo_pos_filter")
 
-    sql1 = """CREATE TABLE hp_neg_filter (
-             `id` INT NOT NULL AUTO_INCREMENT,
-             `comment` VARCHAR(5000) NOT NULL,
-              PRIMARY KEY (`id`))"""
+#     sql1 = """CREATE TABLE hp_neg_filter (
+#              `id` INT NOT NULL AUTO_INCREMENT,
+#              `comment` VARCHAR(5000) NOT NULL,
+#               PRIMARY KEY (`id`))"""
     sql2 = """CREATE TABLE hp_pos_filter (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
-    sql3 = """CREATE TABLE lenovo_neg_filter (
-             `id` INT NOT NULL AUTO_INCREMENT,
-             `comment` VARCHAR(5000) NOT NULL,
-              PRIMARY KEY (`id`))"""
+#     sql3 = """CREATE TABLE lenovo_neg_filter (
+#              `id` INT NOT NULL AUTO_INCREMENT,
+#              `comment` VARCHAR(5000) NOT NULL,
+#               PRIMARY KEY (`id`))"""
     sql4 = """CREATE TABLE lenovo_pos_filter (
              `id` INT NOT NULL AUTO_INCREMENT,
              `comment` VARCHAR(5000) NOT NULL,
               PRIMARY KEY (`id`))"""
     
-    cursor.execute(sql1)
+#     cursor.execute(sql1)
     cursor.execute(sql2)
-    cursor.execute(sql3)
+#     cursor.execute(sql3)
     cursor.execute(sql4)
     
     print("CREATE TABLE OK\n")
@@ -61,14 +61,14 @@ if __name__ == '__main__':
 #     sql1 = "select comment FROM crawl.hpscoreneg where score=1 union select comment from crawl.lenovoscoreneg union select comment from crawl.negcomment where score=1"
 #     sql2 = "select comment from poscomment"
     
-    sql1 = "select comment from hp_neg_original"
+#     sql1 = "select comment from hp_neg_original"
     sql2 = "select comment from hp_pos_original"
-    sql3 = "select comment from lenovo_neg_original"
+#     sql3 = "select comment from lenovo_neg_original"
     sql4 = "select comment from lenovo_pos_original"
     
-    data1 = pd.read_sql(sql1, conn)
+#     data1 = pd.read_sql(sql1, conn)
     data2 = pd.read_sql(sql2, conn)
-    data3 = pd.read_sql(sql3, conn)
+#     data3 = pd.read_sql(sql3, conn)
     data4 = pd.read_sql(sql4, conn)
     
 #     print("处理前：\ndata1")
@@ -81,9 +81,9 @@ if __name__ == '__main__':
 #     print(data4.info())
     
     '''去重'''
-    data1 = data1.drop_duplicates()
+#     data1 = data1.drop_duplicates()
     data2 = data2.drop_duplicates()
-    data3 = data3.drop_duplicates()
+#     data3 = data3.drop_duplicates()
     data4 = data4.drop_duplicates()
     # print(data.duplicated().value_counts() + "\n") # 对返回结果进行计数
     # data.drop_duplicates(subset='content', keep='first', inplace=True)
@@ -97,14 +97,14 @@ if __name__ == '__main__':
 #     print("data3\n" + data3.loc[data3["comment"] == "此用户未填写评价内容"])
 #     print("data4\n" + data4.loc[data4["comment"] == "此用户未填写评价内容"])
     
-    data1.drop(data1.loc[data1["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
-    data1['comment'] = data1['comment'].str.replace('此用户未填写评价内容', '')  # 查漏
+#     data1.drop(data1.loc[data1["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
+#     data1['comment'] = data1['comment'].str.replace('此用户未填写评价内容', '')  # 查漏
     
     data2.drop(data2.loc[data2["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
     data2['comment'] = data2['comment'].str.replace('此用户未填写评价内容', '')
     
-    data3.drop(data3.loc[data3["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
-    data3['comment'] = data3['comment'].str.replace('此用户未填写评价内容', '')
+#     data3.drop(data3.loc[data3["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
+#     data3['comment'] = data3['comment'].str.replace('此用户未填写评价内容', '')
      
     data4.drop(data4.loc[data4["comment"] == "此用户未填写评价内容"].index, axis=0, inplace=True)
     data4['comment'] = data4['comment'].str.replace('此用户未填写评价内容', '')
@@ -113,14 +113,14 @@ if __name__ == '__main__':
     #     data.info()
     
     '''短句过滤'''
-    data1 = data1.iloc[:, 0]  # 定位，取评论那部分数据
-    data1 = data1[data1.apply(len) >= 5]  # 至少5个字的评论才会被保留
+#     data1 = data1.iloc[:, 0]  # 定位，取评论那部分数据
+#     data1 = data1[data1.apply(len) >= 5]  # 至少5个字的评论才会被保留
     
     data2 = data2.iloc[:, 0]
     data2 = data2[data2.apply(len) >= 5]
     
-    data3 = data3.iloc[:, 0]
-    data3 = data3[data3.apply(len) >= 5]
+#     data3 = data3.iloc[:, 0]
+#     data3 = data3[data3.apply(len) >= 5]
      
     data4 = data4.iloc[:, 0]
     data4 = data4[data4.apply(len) >= 5]
@@ -128,9 +128,9 @@ if __name__ == '__main__':
     '''写进数据库'''
     # 范例：engine = create_engine("mysql+pymysql://user:password@host:port/databasename?charset=utf8",echo=False)
     engine_loacl = create_engine('mysql+pymysql://root:123456@127.0.0.1:3306/interface_data?charset=utf8', echo=False)
-    data1.to_sql(name='hp_neg_filter', con=engine_loacl, if_exists="append", index=False)
+#     data1.to_sql(name='hp_neg_filter', con=engine_loacl, if_exists="append", index=False)
     data2.to_sql(name='hp_pos_filter', con=engine_loacl, if_exists="append", index=False)
-    data3.to_sql(name='lenovo_neg_filter', con=engine_loacl, if_exists="append", index=False)
+#     data3.to_sql(name='lenovo_neg_filter', con=engine_loacl, if_exists="append", index=False)
     data4.to_sql(name='lenovo_pos_filter', con=engine_loacl, if_exists="append", index=False)
     
     conn.close()
